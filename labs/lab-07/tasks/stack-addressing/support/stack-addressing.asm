@@ -55,6 +55,7 @@ push_nums:
     jl print_array
     PRINTF32 `\n\x0`
 
+
     ; restore the previous value of the EBP (Base Pointer)
     mov esp, ebp
 
