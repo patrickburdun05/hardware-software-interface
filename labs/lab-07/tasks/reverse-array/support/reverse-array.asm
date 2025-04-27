@@ -15,15 +15,15 @@ main:
 
     ; TODO push the elements of the array on the stack
     mov ecx, ARRAY_LEN
-    push_elements:
+push_elements:
         push dword [input + 4 * (ecx - 1)]
-    loop push_elements
+loop push_elements
 
     mov ecx, ARRAY_LEN
     
-    pop_elements:
+pop_elements:
         pop dword [output + 4 * (ecx - 1)]
-    loop pop_elements
+loop pop_elements
 
     
 
