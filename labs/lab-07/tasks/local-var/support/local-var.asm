@@ -16,58 +16,91 @@ section .text
 extern printf
 global main
 main:
-    mov eax, 0 ; counter used for array_1
-    mov ebx, 0 ; counter used for array_2
-    mov ecx, 0 ; counter used for the output array
+    mov ebp, esp
+    sub esp, 4 * ARRAY_1_LEN ; pentru a aloca memoria pentru array 1
+    mov eax, esp
+    mov edx, 0
+allocate_array1:
+    mov ecx, [array_1 + 4 * edx]
+    mov [eax], ecx
+    inc edx
+    add eax, 4
+        cmp edx, ARRAY_1_LEN ; verificam daca am alocat pt tot vectorul
+        jl allocate_array1
+    mov eax, esp
+    
+    sub esp, 4 * ARRAY_2_LEN
+    mov ebx, esp
+    mov edx, 0
+    allocate_array2:
+        mov ecx, [array_2 + 4 * edx]
+        mov [ebx], ecx
+        inc edx
+        add ebx, 4
+        cmp edx, ARRAY_2_LEN
+        jl allocate_array2
+        
+    mov ebx, esp
+    sub esp, 4 * ARRAY_OUTPUT_LEN
+    mov ecx, esp
 
 merge_arrays:
-    mov edx, [array_1 + 4 * eax]
-    cmp edx, [array_2 + 4 * ebx]
+    mov edx, [eax]
+    cmp edx, [ebx]
     jg array_2_lower
 array_1_lower:
-    mov [array_output + 4 * ecx], edx
-    inc eax
-    inc ecx
+    mov [ecx], edx
+    add eax, 4
+    add ecx, 4
     jmp verify_array_end
 array_2_lower:
-    mov edx, [array_2 + 4 * ebx]
-    mov [array_output + 4 * ecx], edx
-    inc ecx
-    inc ebx
+    mov edx, [ebx]
+    mov [ecx], edx
+    add ecx, 4
+    add ebx, 4
 
 verify_array_end:
-    cmp eax, ARRAY_1_LEN
+    mov edx, ebp
+    cmp eax, edx
     jge copy_array_2
-    cmp ebx, ARRAY_2_LEN
+    sub edx, 4 * ARRAY_1_LEN
+    cmp ebx, ebp
     jge copy_array_1
     jmp merge_arrays
 
 copy_array_1:
-    mov edx, [array_1 + 4 * eax]
-    mov [array_output + 4 * ecx], edx
-    inc ecx
-    inc eax
-    cmp eax, ARRAY_1_LEN
+    xor edx, edx
+    mov eax, [eax]
+    mov [ecx], edx
+    add ecx, 4
+    add eax, 4
+    cmp eax, ebp
     jb copy_array_1
     jmp print_array
 copy_array_2:
-    mov edx, [array_2 + 4 * ebx]
-    mov [array_output + 4 * ecx], edx
-    inc ecx
-    inc ebx
-    cmp ebx, ARRAY_2_LEN
+    xor edx, edx
+    mov edx, [ebx]
+    mov [ecx], edx
+    add ecx, 4
+    add ebx, 4
+    mov edx, ebp
+    sub edx, 4 * ARRAY_1_LEN
+    cmp ebx, edx
     jb copy_array_2
 
 print_array:
     PRINTF32 `Array merged:\n\x0`
     mov ecx, 0
+    mov eax, 0
 print:
-    mov eax, [array_output + 4 * ecx]
+    mov eax, [esp]
     PRINTF32 `%d \x0`, eax
+    add esp, 4
     inc ecx
     cmp ecx, ARRAY_OUTPUT_LEN
     jb print
 
     PRINTF32 `\n\x0`
     xor eax, eax
+    mov esp, ebp
     ret
