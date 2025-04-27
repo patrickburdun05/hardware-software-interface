@@ -5,6 +5,7 @@ section .text
 extern printf
 global main
 main:
+
     ; numbers are placed in these two registers
     mov eax, 1
     mov ebx, 4
