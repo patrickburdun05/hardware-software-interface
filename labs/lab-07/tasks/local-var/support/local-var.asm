@@ -13,6 +13,7 @@ array_output times 12 dd 0
 
 section .text
 
+
 extern printf
 global main
 main:
